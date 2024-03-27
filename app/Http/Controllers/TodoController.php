@@ -3,16 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
+use App\Repositories\TodoRepositoryInterface;
 use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
+    protected $todoRepository;
+
+    public function __construct(TodoRepositoryInterface $todoRepository)
+    {
+        $this->todoRepository = $todoRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $todos = $this->todoRepository->all();
+
+        return view('todos.index', compact('todos'));
     }
 
     /**
@@ -20,7 +30,7 @@ class TodoController extends Controller
      */
     public function create()
     {
-        //
+        return view('todos.create');
     }
 
     /**
@@ -28,7 +38,9 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->todoRepository->create($request->all());
+
+        return redirect()->route('todos.index');
     }
 
     /**
@@ -36,7 +48,9 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        //
+        $todo = $this->todoRepository->find($todo->id);
+
+        return view('todos.show', compact('todo'));
     }
 
     /**
@@ -44,7 +58,9 @@ class TodoController extends Controller
      */
     public function edit(Todo $todo)
     {
-        //
+        $todo = $this->todoRepository->find($todo->id);
+
+        return view('todos.edit', compact('todo'));
     }
 
     /**
@@ -52,7 +68,9 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        $this->todoRepository->update($todo->id, $request->all());
+
+        return redirect()->route('todos.index');
     }
 
     /**
@@ -60,6 +78,8 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
-        //
+        $this->todoRepository->delete($todo->id);
+
+        return redirect()->route('todos.index');
     }
 }
